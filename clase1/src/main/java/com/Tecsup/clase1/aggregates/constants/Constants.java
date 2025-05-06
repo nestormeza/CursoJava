@@ -1,0 +1,8 @@
+package com.Tecsup.clase1.aggregates.constants;
+
+public class Constants {
+    public static final String STATUS_ACTIVE = "ACTIVE";
+    public static final String STATUS_INACTIVE = "INACTIVE";
+    public static final String STATUS_DELETED = "DELETED";
+    public static final String USER_ADMIN = "ROSAS";
+}
