@@ -4,6 +4,7 @@ import com.codigo.retrofit.aggregates.constants.Constants;
 import com.codigo.retrofit.aggregates.response.ReniecResponse;
 import com.codigo.retrofit.aggregates.response.ResponseBase;
 import com.codigo.retrofit.entity.PersonEntity;
+import com.codigo.retrofit.exception.ConsultReniecException;
 import com.codigo.retrofit.repository.PersonRepository;
 import com.codigo.retrofit.retrofit.ClientRetroFit;
 import com.codigo.retrofit.retrofit.IRetroFitSerive;
@@ -22,7 +23,7 @@ import java.util.Optional;
 @Service
 @Log4j2
 @RequiredArgsConstructor
-public class PersonService implements IPersonService {
+public class PersonServiceImpl implements IPersonService {
 
     private final PersonRepository personRepository;
 
@@ -33,30 +34,25 @@ public class PersonService implements IPersonService {
 
     //buscar dni en el api de reniec
     @Override
-    public ReniecResponse findByDni(String dni) throws IOException {
+    public ReniecResponse findByDni(String dni) {
         return searchPersonByDni(dni);
     }
 
     //buscar una persona en la base de datos
     @Override
-    public ResponseBase<PersonEntity> findById(long id) throws IOException {
+    public ResponseBase<PersonEntity> findById(long id) {
         PersonEntity person = searchDataBase(id);
-        if(person==null){
-            return buildResponse(4000, "Ocurrio un Error no existe ID en base de datos!!", Optional.empty());
-        }
+
         return buildResponse(2001, "todo OK!!", Optional.of(person));
     }
 
     //Guardar una persona en la base de datos
     @Override
-    public ResponseBase<PersonEntity> savePerson(String dni) throws IOException {
+    public ResponseBase<PersonEntity> savePerson(String dni) {
         ReniecResponse personSearch = searchPersonByDni(dni);
 
-        if (personSearch == null) {
-            return buildResponse(4000, "Ocurrio un Error no existe respuesta de Reniec!!", Optional.empty());
-        }
-
         PersonEntity person = person(personSearch);
+
         log.info("Guardando persona en la base de datos");
         PersonEntity personSave = personRepository.save(person);
 
@@ -65,11 +61,9 @@ public class PersonService implements IPersonService {
 
     //actualizar una persona
     @Override
-    public ResponseBase<PersonEntity> updatePerson(PersonEntity personEntity, long id) throws IOException {
+    public ResponseBase<PersonEntity> updatePerson(PersonEntity personEntity, long id) {
         PersonEntity person=searchDataBase(id);
-        if(person==null){
-            return buildResponse(4000, "Ocurrio un Error no existe ID en base de datos!!", Optional.empty());
-        }
+
         log.info("Actualizando persona en la base de datos");
         PersonEntity personSave = personRepository.save(personEntity);
         return buildResponse(2001, "todo OK!!", Optional.of(personSave));
@@ -77,36 +71,46 @@ public class PersonService implements IPersonService {
 
     //eliminar una persona
     @Override
-    public ResponseBase<PersonEntity> deletePerson(long id) throws IOException {
+    public ResponseBase<PersonEntity> deletePerson(long id){
         PersonEntity person = searchDataBase(id);
-        if(person==null){
-            return buildResponse(4000, "Ocurrio un Error no existe ID en base de datos!!", Optional.empty());
-        }
+
         log.info("Eliminando persona en la base de datos");
         personRepository.delete(person);
+
         return buildResponse(2001, "todo OK!!", Optional.of(person));
     }
 
     //busquedad de base de datos
     private PersonEntity searchDataBase(long id) {
-        log.info("Buscando persona en la base de datos");
-        return personRepository.findById(id).orElse(null);
+        try {
+            log.info("Buscando persona en la base de datos");
+            return personRepository.findById(id).orElseThrow(()-> new ConsultReniecException("Persona no encontrada!!"));
+        }catch (Exception e){
+            throw new ConsultReniecException("Error al buscar persona en la base de datos!!",e);
+        }
     }
 
     //llamar a api
-    private ReniecResponse searchPersonByDni(String dni) throws IOException {
-        log.info("Iniciando busquedad de persona por dni " + dni);
-        Response<ReniecResponse> response = configRetroFit.getReniecDni("Bearer " + token, dni).execute();
-        if (response.isSuccessful() && Objects.nonNull(response.body())) {
-            log.info("Persona encontrada " + dni);
-            return response.body();
+    private ReniecResponse searchPersonByDni(String dni) {
+        try {
+            log.info("Iniciando busquedad de persona por dni " + dni);
+            Response<ReniecResponse> response = configRetroFit.getReniecDni("Bearer " + token, dni).execute();
+            if (response.isSuccessful() && Objects.nonNull(response.body())) {
+                log.info("Persona encontrada " + dni);
+                return response.body();
+            }else{
+                throw new ConsultReniecException("Dni no valido"+dni);
+            }
+        }catch (Exception e){
+            throw new ConsultReniecException("Error del servidor de reniec al consultar:"+dni,e);
         }
-        log.info("Persona no encontrada " + dni);
-        return new ReniecResponse();
     }
 
     //dar fomarto de retorno de api
     private PersonEntity person(ReniecResponse reniecResponse) {
+        if(reniecResponse==null){
+            throw new ConsultReniecException("Error en la respuesta del servidor reniec");
+        }
         return PersonEntity.builder()
                 .name(reniecResponse.getNombres())
                 .fullName(reniecResponse.getNombreCompleto())
