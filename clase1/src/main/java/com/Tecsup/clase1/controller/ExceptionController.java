@@ -11,7 +11,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class ExceptionController {
 
-    @ExceptionHandler(Exception.class)
+     
     public ResponseEntity<Map<String,String>> ExceptionController(Exception exception) {
         Map<String,String> errorBody = new HashMap<>();
         errorBody.put("error", "Error de reniec");
