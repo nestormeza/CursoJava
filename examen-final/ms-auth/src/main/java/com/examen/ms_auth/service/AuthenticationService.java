@@ -10,4 +10,6 @@ public interface AuthenticationService {
     UserResponse signUpUser(SignUpRequest signUpRequest);
     SignInResponse signIn(SignInRequest signInRequest);
     SignInResponse getTokenByRefreshToken(String token) throws IllegalAccessException;
+    boolean validateToken(String token);
+
 }

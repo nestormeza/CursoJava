@@ -43,7 +43,7 @@ public class JwtServiceImpl implements JwtService {
 
         //tiempo de vide del token
         Date dateCreation = new Date();
-        Date dateExpiration = new Date(dateCreation.getTime() + 60000);
+        Date dateExpiration = new Date(dateCreation.getTime() + 6000000);
 
         return Jwts.builder()
                 .setHeaderParam("typ","JWT")

@@ -72,6 +72,20 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return SignInResponse.builder().accessToken(newToken).refreshToken(token).build();
     }
 
+    @Override
+    public boolean validateToken(String token) {
+        try {
+            String usernameToken = jwtService.getUserName(token);
+            UserDetails userdetails = userService.userDetailsService().loadUserByUsername(usernameToken);
+
+            boolean result = jwtService.validateToken(token,userdetails) && !jwtService.ValidateIsRefreshToken(token);
+
+            return  result;
+        }catch (Exception ex){
+            throw new GlobalException(400,"El token no es valido");
+        }
+    }
+
     private UserEntity convertUserEntity(SignUpRequest signUpRequest){
         return UserEntity.builder()
                 .name(signUpRequest.getName())
