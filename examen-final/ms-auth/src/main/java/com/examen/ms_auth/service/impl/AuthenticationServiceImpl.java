@@ -79,7 +79,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             UserDetails userdetails = userService.userDetailsService().loadUserByUsername(usernameToken);
 
             boolean result = jwtService.validateToken(token,userdetails) && !jwtService.ValidateIsRefreshToken(token);
-
+            log.info(result);
             return  result;
         }catch (Exception ex){
             throw new GlobalException(400,"El token no es valido");

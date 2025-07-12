@@ -49,8 +49,8 @@ public class AuthenticationController {
         return ResponseEntity.ok(new ResponseStandard<>(200,Constants.SUCCESS_LOGIN,signInUser));
     }
 
-    @PostMapping("/validate")
-    public ResponseEntity<Boolean> validateToken(@RequestParam String token){
+    @PostMapping("/validate/{token}")
+    public ResponseEntity<Boolean> validateToken(@PathVariable String token){
         return ResponseEntity.ok(authenticationService.validateToken(token));
     }
 

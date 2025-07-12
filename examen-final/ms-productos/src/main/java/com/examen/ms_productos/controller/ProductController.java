@@ -41,6 +41,4 @@ public class ProductController {
         List<ResponseProduct> products= productService.allProduct();
         return ResponseEntity.ok(new ResponseStandard<>(200, Constants.PRODUCT_LIST,products));
     }
-
-
 }
