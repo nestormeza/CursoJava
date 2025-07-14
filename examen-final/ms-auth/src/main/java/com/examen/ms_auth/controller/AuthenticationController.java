@@ -5,6 +5,7 @@ import com.examen.ms_auth.utils.constants.constans.Constants;
 import com.examen.ms_auth.utils.constants.request.SignInRequest;
 import com.examen.ms_auth.utils.constants.request.SignUpRequest;
 import com.examen.ms_auth.utils.constants.response.ResponseStandard;
+import com.examen.ms_auth.utils.constants.response.ResponseValidate;
 import com.examen.ms_auth.utils.constants.response.SignInResponse;
 import com.examen.ms_auth.utils.constants.response.UserResponse;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -50,7 +51,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/validate/{token}")
-    public ResponseEntity<Boolean> validateToken(@PathVariable String token){
+    public ResponseEntity<ResponseValidate> validateToken(@PathVariable String token){
         return ResponseEntity.ok(authenticationService.validateToken(token));
     }
 

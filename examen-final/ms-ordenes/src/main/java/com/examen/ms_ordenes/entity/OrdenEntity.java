@@ -1,5 +1,6 @@
 package com.examen.ms_ordenes.entity;
 
+import com.examen.ms_ordenes.utils.response.ResponseProduct;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,6 +22,6 @@ public class OrdenEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private int iduser;
-    private List<Integer> id_product;
+    private List<ResponseProduct> id_product;
     private LocalDateTime fecha;
 }

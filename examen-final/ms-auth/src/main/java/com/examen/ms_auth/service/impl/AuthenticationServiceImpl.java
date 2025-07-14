@@ -12,8 +12,10 @@ import com.examen.ms_auth.utils.constants.constans.Constants;
 import com.examen.ms_auth.utils.constants.constans.Role;
 import com.examen.ms_auth.utils.constants.request.SignInRequest;
 import com.examen.ms_auth.utils.constants.request.SignUpRequest;
+import com.examen.ms_auth.utils.constants.response.ResponseValidate;
 import com.examen.ms_auth.utils.constants.response.SignInResponse;
 import com.examen.ms_auth.utils.constants.response.UserResponse;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,10 +24,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -73,14 +72,18 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public boolean validateToken(String token) {
+    public ResponseValidate validateToken(String token) {
         try {
+            Claims claims = jwtService.claims(token);
+            List<String> roles = claims.get("roles", List.class);
+
             String usernameToken = jwtService.getUserName(token);
             UserDetails userdetails = userService.userDetailsService().loadUserByUsername(usernameToken);
 
             boolean result = jwtService.validateToken(token,userdetails) && !jwtService.ValidateIsRefreshToken(token);
-            log.info(result);
-            return  result;
+
+
+            return  new ResponseValidate(result,roles);
         }catch (Exception ex){
             throw new GlobalException(400,"El token no es valido");
         }

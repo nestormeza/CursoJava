@@ -82,6 +82,11 @@ public class JwtServiceImpl implements JwtService {
         return Constants.REFRESH.equalsIgnoreCase(typeToken);
     }
 
+    @Override
+    public Claims claims(String token) {
+        return AllClaims(token);
+    }
+
     //decodificar clave
     private Key getKey(){
         byte[] key = Decoders.BASE64.decode(keySignature);

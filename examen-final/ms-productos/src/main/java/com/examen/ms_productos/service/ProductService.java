@@ -7,9 +7,10 @@ import com.examen.ms_productos.utils.response.ResponseProduct;
 import java.util.List;
 
 public interface ProductService {
-    ResponseProduct saveProduct(ProductRequest productRequest);
-    ResponseProduct updateProduct(ProductEntity productEntity);
-    ResponseProduct deleteProduct(int id);
-    List<ResponseProduct> allProduct();
+    ResponseProduct saveProduct(String token,ProductRequest productRequest);
+    ResponseProduct updateProduct(String token,ProductEntity productEntity);
+    ResponseProduct deleteProduct(String token,int id);
+    List<ResponseProduct> allProduct(String token);
+    ProductEntity validateProduct(int id,String token);
 }
 
