@@ -1,6 +1,5 @@
 package com.examen.ms_ordenes.utils.response;
 
-import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,9 +8,9 @@ import java.util.List;
 
 @Getter
 @Setter
-@Builder
 public class ResponseOrden {
-    private int userId;
+    private int id;
+    private int iduser;
     private List<ResponseProduct> products;
     private LocalDateTime date;
 }

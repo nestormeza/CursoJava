@@ -6,6 +6,6 @@ import com.examen.ms_ordenes.utils.response.ResponseOrden;
 import java.util.List;
 
 public interface OrdenService {
-    List<ResponseOrden> allOrden(String token);
     ResponseOrden saveOrden(RequestOrden requestOrden,String token);
+    List<ResponseOrden> allOrden(String token);
 }

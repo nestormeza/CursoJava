@@ -1,27 +1,29 @@
 package com.examen.ms_ordenes.entity;
 
-import com.examen.ms_ordenes.utils.response.ResponseProduct;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @Entity
-@Table(name = "odernes")
+@Table(name = "orden")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class OrdenEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
-    private int iduser;
-    private List<ResponseProduct> id_product;
+
+    private int usuarioId;
+
     private LocalDateTime fecha;
+
+    @ElementCollection
+    @CollectionTable(name = "orden_productos", joinColumns = @JoinColumn(name = "orden_id"))
+    @Column(name = "producto_id")
+    private List<Integer> productosIds;
 }
