@@ -12,6 +12,6 @@ import java.util.List;
 @Setter
 @Builder
 public class RequestOrden {
-    private ResponseUser user;
-    private List<ResponseProduct> products;
+    private int user;
+    private List<Integer> products;
 }

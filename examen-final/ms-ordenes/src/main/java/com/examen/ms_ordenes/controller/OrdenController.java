@@ -1,14 +1,12 @@
 package com.examen.ms_ordenes.controller;
 
 import com.examen.ms_ordenes.service.OrdenService;
+import com.examen.ms_ordenes.utils.request.RequestOrden;
 import com.examen.ms_ordenes.utils.response.ResponseOrden;
 import com.examen.ms_ordenes.utils.response.ResponseStandard;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,6 +19,11 @@ public class OrdenController {
     @GetMapping("/all")
     public ResponseEntity<ResponseStandard<List<ResponseOrden>>> all(@RequestHeader("Authorization") String token){
         return ResponseEntity.ok(new ResponseStandard<>(200,"Lista de ordenes",ordenService.allOrden(token)));
+    }
+
+    @PostMapping("/save")
+    public ResponseEntity<ResponseStandard<ResponseOrden>> save(@RequestHeader("Authorization") String token, @RequestBody RequestOrden requestOrden){
+        return ResponseEntity.ok(new ResponseStandard<>(200,"La orden se registro correctamente",ordenService.saveOrden(requestOrden,token)));
     }
 
 }

@@ -9,14 +9,15 @@ import com.examen.ms_ordenes.service.ProductService;
 import com.examen.ms_ordenes.utils.request.RequestOrden;
 import com.examen.ms_ordenes.utils.response.ResponseOrden;
 import com.examen.ms_ordenes.utils.response.ResponseProduct;
-import com.examen.ms_ordenes.utils.response.ResponseUser;
 import com.examen.ms_ordenes.utils.response.ResponseValidate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -41,29 +42,50 @@ public class OrdenServiceImpl implements OrdenService {
 
     @Override
     public ResponseOrden saveOrden(RequestOrden requestOrden,String token) {
-        return null;
+        ResponseValidate getValidate = authService.validateTokenAuth(token);
+        authService.getRoles(getValidate,List.of("USER","ADMIN","SUPERADMIN"));
+        try{
+            OrdenEntity save= ordenRepository.save(convertOrdenEntity(requestOrden,token));
+            return convertResponseOrden(save,token);
+        } catch (Exception e){
+            throw  new GlobalException(500,"Error al registrar orden");
+        }
     }
 
-    //convertir a respon Ordenes
+    //convertir
     private ResponseOrden convertResponseOrden(OrdenEntity ordenEntity,String token){
         return ResponseOrden.builder()
                 .userId(ordenEntity.getId())
-                .products(allProduct(ordenEntity,token))
+                .products(searchProductAll(ordenEntity.getProductosIds(),token))
                 .date(ordenEntity.getFecha())
         .build();
     }
 
+    private OrdenEntity convertOrdenEntity(RequestOrden requestOrden,String token){
+        List<ResponseProduct> productos = searchProductAll(requestOrden.getProducts(), token);
+
+        List<Integer> productoIds = productos.stream()
+                .map(ResponseProduct::getId) // Asumiendo que getId() devuelve Integer
+                .collect(Collectors.toList());
+        return OrdenEntity.builder()
+                .usuarioId(requestOrden.getUser())
+                .productosIds(productoIds)
+                .fecha(LocalDateTime.now())
+                .build();
+    }
+
+
     //Obetener los productos
-    private List<ResponseProduct> allProduct(OrdenEntity ordenEntity,String token){
-        List<Integer> productRequest = ordenEntity.getProductosIds();
+    private List<ResponseProduct> searchProductAll(List<Integer> ids, String token){
         List<ResponseProduct> products = new ArrayList<>();
 
-        for (int id : productRequest) {
+        for (int id : ids) {
             ResponseProduct product = productService.validateProduct(id,token); // Validar uno por uno
             products.add(product);
         }
 
         return products;
     }
+
 
 }
