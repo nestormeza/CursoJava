@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 
-@FeignClient(name = "client-product",url = "http://localhost:8080/apis/examen/api/product")
+@FeignClient(name = "client-product",url = "${api-product}")
 public interface FeingClienProduct {
     @PostMapping("/find/{id}")
     ResponseProduct getvalidateProduct(

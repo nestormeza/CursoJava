@@ -3,6 +3,7 @@ package com.examen.ms_ordenes.service.impl;
 import com.examen.ms_ordenes.config.FeingClientProductApi;
 import com.examen.ms_ordenes.exception.GlobalException;
 import com.examen.ms_ordenes.service.ProductService;
+import com.examen.ms_ordenes.utils.constants.Constants;
 import com.examen.ms_ordenes.utils.response.ResponseProduct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -21,7 +22,8 @@ public class ProductServiceImpl implements ProductService {
         try {
             return feingClientProductApi.searchProduct(id,token);
         }catch (Exception ex){
-            throw new GlobalException(500,"Error al obtener el producto");
+            log.error("Error al registro : "+ex.getMessage(), ex);
+            throw new GlobalException(500, Constants.ERROR_500);
         }
     }
 }

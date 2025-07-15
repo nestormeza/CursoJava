@@ -1,6 +1,7 @@
 package com.examen.ms_ordenes.controller;
 
 import com.examen.ms_ordenes.service.OrdenService;
+import com.examen.ms_ordenes.utils.constants.Constants;
 import com.examen.ms_ordenes.utils.request.RequestOrden;
 import com.examen.ms_ordenes.utils.response.ResponseOrden;
 import com.examen.ms_ordenes.utils.response.ResponseStandard;
@@ -18,12 +19,12 @@ public class OrdenController {
 
     @GetMapping("/all")
     public ResponseEntity<ResponseStandard<List<ResponseOrden>>> all(@RequestHeader("Authorization") String token){
-        return ResponseEntity.ok(new ResponseStandard<>(200,"Lista de ordenes",ordenService.allOrden(token)));
+        return ResponseEntity.ok(new ResponseStandard<>(200, Constants.LIST_ORDEN,ordenService.allOrden(token)));
     }
 
     @PostMapping("/save")
     public ResponseEntity<ResponseStandard<ResponseOrden>> save(@RequestHeader("Authorization") String token, @RequestBody RequestOrden requestOrden){
-        return ResponseEntity.ok(new ResponseStandard<>(200,"La orden se registro correctamente",ordenService.saveOrden(requestOrden,token)));
+        return ResponseEntity.ok(new ResponseStandard<>(200,Constants.REGISTER_ORDEN,ordenService.saveOrden(requestOrden,token)));
     }
 
 }

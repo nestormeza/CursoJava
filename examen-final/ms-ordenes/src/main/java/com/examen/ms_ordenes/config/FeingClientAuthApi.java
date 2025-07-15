@@ -2,6 +2,7 @@ package com.examen.ms_ordenes.config;
 
 import com.examen.ms_ordenes.exception.GlobalException;
 import com.examen.ms_ordenes.rest.FeingClientAuth;
+import com.examen.ms_ordenes.utils.constants.Constants;
 import com.examen.ms_ordenes.utils.response.ResponseValidate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -18,13 +19,12 @@ public class FeingClientAuthApi {
             log.info("Validando...");
             ResponseValidate result = feingClientAuth.getvalidateToken(token);
             if (result == null || !Boolean.TRUE.equals(result.getState())) {
-                throw new GlobalException(401, "Token inválido");
+                throw new GlobalException(401, Constants.TOKEN_INVALIDO);
             }
-
             return result;
         }catch (Exception e){
-            log.error("Error al validar token", e);
-            throw new GlobalException(500,"Error");
+            log.error("Error al validar token"+e.getMessage(), e);
+            throw new GlobalException(500,Constants.ERROR_500);
         }
     }
 }

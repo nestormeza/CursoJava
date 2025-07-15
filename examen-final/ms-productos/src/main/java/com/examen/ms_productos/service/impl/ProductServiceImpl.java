@@ -6,6 +6,7 @@ import com.examen.ms_productos.exception.GlobalException;
 import com.examen.ms_productos.repository.ProductRepository;
 import com.examen.ms_productos.service.ProductService;
 import com.examen.ms_productos.utils.constants.Constants;
+import com.examen.ms_productos.utils.constants.Role;
 import com.examen.ms_productos.utils.request.ProductRequest;
 import com.examen.ms_productos.utils.response.ResponseProduct;
 import com.examen.ms_productos.utils.response.ResponseValidate;
@@ -27,7 +28,7 @@ public class ProductServiceImpl implements ProductService {
     public ResponseProduct saveProduct(String token,ProductRequest productRequest) {
         ResponseValidate validate= validateToken(token);
         // Validar que tenga el rol ADMIN
-        validateRole(validate,List.of("ADMIN","SUPERADMIN"));
+        validateRole(validate,List.of(Role.ADMIN.name(),Role.SUPERADMIN.name()));
         try {
             validateNewProduct(convertProductEntity(productRequest));
             ProductEntity productNew = convertProductEntity(productRequest);
@@ -42,7 +43,7 @@ public class ProductServiceImpl implements ProductService {
     public ResponseProduct updateProduct(String token,ProductEntity productEntity) {
         ResponseValidate validate= validateToken(token);
         // Validar que tenga el rol ADMIN
-        validateRole(validate,List.of("ADMIN","SUPERADMIN"));
+        validateRole(validate,List.of(Role.ADMIN.name(),Role.SUPERADMIN.name()));
         try {
             validateUpdateProduct(productEntity);
             return registerProduct(productEntity);
@@ -55,7 +56,7 @@ public class ProductServiceImpl implements ProductService {
     public ResponseProduct deleteProduct(String token,int id) {
         ResponseValidate validate= validateToken(token);
         // Validar que tenga el rol ADMIN
-        validateRole(validate,List.of("ADMIN","SUPERADMIN"));
+        validateRole(validate,List.of(Role.ADMIN.name(),Role.SUPERADMIN.name()));
         try{
             ProductEntity product = searchProduct(id);
             log.info("Eliminando producto");
@@ -70,7 +71,7 @@ public class ProductServiceImpl implements ProductService {
     public List<ResponseProduct> allProduct(String token) {
         ResponseValidate validate= validateToken(token);
         // Validar que tenga el rol ADMIN
-        validateRole(validate,List.of("ADMIN","SUPERADMIN"));
+        validateRole(validate,List.of(Role.ADMIN.name(),Role.SUPERADMIN.name()));
         try {
             return productRepository.findAll().stream()
                     .map(this::convertResponseProduct)
@@ -84,7 +85,7 @@ public class ProductServiceImpl implements ProductService {
     public ProductEntity validateProduct(int id,String token) {
         ResponseValidate validate= validateToken(token);
         // Validar que tenga el rol ADMIN
-        validateRole(validate,List.of("USER","ADMIN","SUPERADMIN"));
+        validateRole(validate,List.of(Role.USER.name(),Role.ADMIN.name(),Role.SUPERADMIN.name()));
         try{
             ProductEntity product = searchProduct(id);
             return product;

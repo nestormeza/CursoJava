@@ -6,6 +6,8 @@ import com.examen.ms_ordenes.respository.OrdenRepository;
 import com.examen.ms_ordenes.service.AuthService;
 import com.examen.ms_ordenes.service.OrdenService;
 import com.examen.ms_ordenes.service.ProductService;
+import com.examen.ms_ordenes.utils.constants.Constants;
+import com.examen.ms_ordenes.utils.constants.Role;
 import com.examen.ms_ordenes.utils.request.RequestOrden;
 import com.examen.ms_ordenes.utils.response.ResponseOrden;
 import com.examen.ms_ordenes.utils.response.ResponseProduct;
@@ -30,25 +32,27 @@ public class OrdenServiceImpl implements OrdenService {
     @Override
     public List<ResponseOrden> allOrden(String token) {
         ResponseValidate getValidate = authService.validateTokenAuth(token);
-        authService.getRoles(getValidate,List.of("ADMIN","SUPERADMIN"));
+        authService.getRoles(getValidate,List.of(Role.ADMIN.name(),Role.SUPERADMIN.name()));
         try {
             return ordenRepository.findAll().stream()
                     .map(orden -> convertResponseOrden(orden,token))
                     .toList();
         }catch (Exception ex){
-            throw  new GlobalException(500,"Error al listar ordenes");
+            log.error("Error al obetener los datos : "+ex.getMessage(), ex);
+            throw  new GlobalException(500, Constants.ERROR_500);
         }
     }
 
     @Override
     public ResponseOrden saveOrden(RequestOrden requestOrden,String token) {
         ResponseValidate getValidate = authService.validateTokenAuth(token);
-        authService.getRoles(getValidate,List.of("USER","ADMIN","SUPERADMIN"));
+        authService.getRoles(getValidate,List.of(Role.USER.name(),Role.ADMIN.name(),Role.SUPERADMIN.name()));
         try{
             OrdenEntity save= ordenRepository.save(convertOrdenEntity(requestOrden,token));
             return convertResponseOrden(save,token);
-        } catch (Exception e){
-            throw  new GlobalException(500,"Error al registrar orden");
+        } catch (Exception ex){
+            log.error("Error al registro : "+ex.getMessage(), ex);
+            throw  new GlobalException(500,Constants.ERROR_500);
         }
     }
 
@@ -58,7 +62,7 @@ public class OrdenServiceImpl implements OrdenService {
                 .userId(ordenEntity.getId())
                 .products(searchProductAll(ordenEntity.getProductosIds(),token))
                 .date(ordenEntity.getFecha())
-        .build();
+                .build();
     }
 
     private OrdenEntity convertOrdenEntity(RequestOrden requestOrden,String token){
@@ -67,6 +71,7 @@ public class OrdenServiceImpl implements OrdenService {
         List<Integer> productoIds = productos.stream()
                 .map(ResponseProduct::getId) // Asumiendo que getId() devuelve Integer
                 .collect(Collectors.toList());
+
         return OrdenEntity.builder()
                 .usuarioId(requestOrden.getUser())
                 .productosIds(productoIds)
@@ -78,12 +83,10 @@ public class OrdenServiceImpl implements OrdenService {
     //Obetener los productos
     private List<ResponseProduct> searchProductAll(List<Integer> ids, String token){
         List<ResponseProduct> products = new ArrayList<>();
-
         for (int id : ids) {
             ResponseProduct product = productService.validateProduct(id,token); // Validar uno por uno
             products.add(product);
         }
-
         return products;
     }
 
